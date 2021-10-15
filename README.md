@@ -1,1 +1,1 @@
-# class_schedule
+# class-schedule
