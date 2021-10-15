@@ -27,6 +27,23 @@
                                  constraintName="fk_professor_department_id"
                                  referencedColumnNames="id"
                                  referencedTableName="department"/>
+
+        <createTable tableName="course">
+            <column name="id" type="serial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_course"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="credits" type="int"/>
+            <column name="department_id" type="int">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="department_id"
+                                 baseTableName="course"
+                                 constraintName="fk_course_department_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="department"/>
     </changeSet>
 
 </databaseChangeLog>
