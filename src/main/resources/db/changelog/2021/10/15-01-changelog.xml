@@ -5,13 +5,28 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
-    <changeSet id="1631388939381-1" author="buratto">
+    <changeSet id="1631398769381-1" author="buratto">
         <createTable tableName="department">
             <column name="id" type="serial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_product"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_department"/>
             </column>
             <column name="name" type="TEXT"/>
         </createTable>
+        <createTable tableName="professor">
+            <column name="id" type="serial">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_professor"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="department_id" type="int">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="department_id"
+                                 baseTableName="professor"
+                                 constraintName="fk_professor_department_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="department"/>
     </changeSet>
 
 </databaseChangeLog>
