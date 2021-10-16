@@ -46,4 +46,29 @@
                                  referencedTableName="department"/>
     </changeSet>
 
+    <changeSet id="1631398769381-2" author="buratto">
+        <createTable tableName="schedule">
+            <column name="semester" type="int"/>
+            <column name="year" type="int"/>
+            <column name="course_id" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="professor_id" type="int">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="course_id"
+                                 baseTableName="schedule"
+                                 constraintName="fk_schedule_course_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="course"/>
+
+        <addForeignKeyConstraint baseColumnNames="professor_id"
+                                 baseTableName="schedule"
+                                 constraintName="fk_schedule_professor_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="professor"/>
+    </changeSet>
+
 </databaseChangeLog>

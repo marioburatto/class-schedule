@@ -1,7 +1,7 @@
 package com.philips.classschedule.testutil;
 
-import com.philips.classschedule.domain.Department;
 import com.philips.classschedule.domain.Course;
+import com.philips.classschedule.domain.Department;
 
 public class CourseFixture {
 

@@ -1,10 +1,10 @@
 package com.philips.classschedule.service;
 
-import com.philips.classschedule.domain.Department;
 import com.philips.classschedule.domain.Course;
+import com.philips.classschedule.domain.Department;
 import com.philips.classschedule.testutil.BaseSpringIntegrationTest;
-import com.philips.classschedule.testutil.DepartmentFixture;
 import com.philips.classschedule.testutil.CourseFixture;
+import com.philips.classschedule.testutil.DepartmentFixture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
