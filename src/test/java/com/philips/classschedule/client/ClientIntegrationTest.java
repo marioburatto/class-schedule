@@ -1,10 +1,16 @@
 package com.philips.classschedule.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.philips.classschedule.controller.dto.CourseDto;
 import com.philips.classschedule.controller.dto.DepartmentDto;
 import com.philips.classschedule.controller.dto.ProfessorDto;
 import com.philips.classschedule.controller.dto.ScheduleDto;
+import com.philips.classschedule.repository.ScheduleRepository;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.hamcrest.core.Is;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,16 +34,32 @@ public class ClientIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
-    public static void main(String[] args) throws IOException {
-        ClientIntegrationTest client = new ClientIntegrationTest();
-        client.port = 8080;
-        client.testLoadExampleData();
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @BeforeEach
+    void cleanUp() {
+        scheduleRepository.deleteAll();
     }
 
     @Test
     void testLoadExampleData() throws IOException {
+        loadExampleData();
+        MatcherAssert.assertThat(scheduleRepository.count(), Is.is(10L));
+
+        JsonNode search = get("/search", JsonNode.class);
+        JsonNode expected = new ObjectMapper().readTree(
+                readFile("pre-load/search_result.json")
+                        .collect(Collectors.joining("\n")));
+
+        MatcherAssert.assertThat(
+                search.toString(),
+                Matchers.equalTo(expected.toString()));
+    }
+
+    void loadExampleData() throws IOException {
         Map<Integer, DepartmentDto> departmentIdMapping = readDepartments()
                 .collect(
                         Collectors.toMap(
@@ -89,6 +111,13 @@ public class ClientIntegrationTest {
                                         .getId())
                         .build())
                 .forEach(it -> post("/schedule", it, it.getClass()));
+    }
+
+    <T> T get(String url, Class<T> responseClass) {
+        return restTemplate.getForEntity(
+                        "http://localhost:" + port + url,
+                        responseClass)
+                .getBody();
     }
 
     <T> T post(String url, Object entity, Class<T> responseClass) {
@@ -151,5 +180,11 @@ public class ClientIntegrationTest {
         InputStream is = getClass().getClassLoader().getResourceAsStream(fileName);
         return new BufferedReader(new InputStreamReader(is))
                 .lines();
+    }
+
+    public static void main(String[] args) throws IOException {
+        ClientIntegrationTest client = new ClientIntegrationTest();
+        client.port = 8080;
+        client.loadExampleData();
     }
 }

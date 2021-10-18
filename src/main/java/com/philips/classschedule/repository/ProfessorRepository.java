@@ -17,7 +17,7 @@ public interface ProfessorRepository extends CrudRepository<Professor, Integer> 
     @Query("SELECT s.schedule.professor.name, s.schedule.course.name " +
             "from ScheduleEntity s " +
             "group by 1, 2 " +
-            "order by 1, 2;")
+            "order by 1, 2")
     List<Object[]> listAllProfessorAndCourseNamesTuples();
 
     default List<ProfessorAndCourseNameProjection> listAllProfessorAndCourseNames() {
