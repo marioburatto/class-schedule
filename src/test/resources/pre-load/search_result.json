@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Daniel Hicks",
+    "courses": [
+      "Clinical Biochemistry"
+    ]
+  },
+  {
+    "name": "Frida Mcintosh",
+    "courses": [
+      "Clinical Biochemistry",
+      "Clinical Neuroscience"
+    ]
+  },
+  {
+    "name": "Rowan Graves",
+    "courses": [
+      "Earth Science",
+      "Geography",
+      "Materials Science and Metallurgy",
+      "Pure Mathematics and Mathematical Statistics"
+    ]
+  },
+  {
+    "name": "Sarahi Barry",
+    "courses": [
+      "Clinical Biochemistry",
+      "Clinical Neuroscience",
+      "Earth Science"
+    ]
+  }
+]

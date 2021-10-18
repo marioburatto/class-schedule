@@ -14,23 +14,23 @@ public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
 
-    public Optional<Course> findById(Integer id){
+    public Optional<Course> findById(Integer id) {
         return courseRepository.findById(id);
     }
 
-    public List<Course> listAll(){
+    public List<Course> listAll() {
         return courseRepository.findAll();
     }
 
-    public Course create(Course course){
+    public Course create(Course course) {
         return courseRepository.save(course);
     }
 
-    public Course update(Course course){
+    public Course update(Course course) {
         return courseRepository.save(course);
     }
 
-    public void delete(Course course){
+    public void delete(Course course) {
         courseRepository.delete(course);
     }
 

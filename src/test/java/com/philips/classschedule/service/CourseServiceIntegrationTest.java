@@ -35,9 +35,11 @@ public class CourseServiceIntegrationTest extends BaseSpringIntegrationTest {
                 courseService.findById(course.getId()).get().getName(),
                 Is.is(course.getName()));
 
-        course.setName("SOME NEW NAME");
-        course.setCredits(4);
-        course.setDepartment(department2);
+        course = course.toBuilder()
+                .name("SOME NEW NAME")
+                .credits(4)
+                .department(department2)
+                .build();
         courseService.update(course);
 
         MatcherAssert.assertThat(

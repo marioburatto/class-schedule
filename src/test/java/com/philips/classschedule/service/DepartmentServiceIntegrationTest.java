@@ -23,7 +23,9 @@ public class DepartmentServiceIntegrationTest extends BaseSpringIntegrationTest 
                 departmentService.findById(department.getId()).get().getName(),
                 Is.is(department.getName()));
 
-        department.setName("SOME NEW NAME");
+        department = department.toBuilder()
+                .name("SOME NEW NAME")
+                .build();
         departmentService.update(department);
 
         MatcherAssert.assertThat(

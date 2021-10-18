@@ -8,17 +8,19 @@
     <changeSet id="1631398769381-1" author="buratto">
         <createTable tableName="department">
             <column name="id" type="serial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_department"/>
+                <constraints nullable="false" primaryKey="true"
+                             primaryKeyName="pk_department"/>
             </column>
             <column name="name" type="TEXT"/>
         </createTable>
         <createTable tableName="professor">
             <column name="id" type="serial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_professor"/>
+                <constraints nullable="false" primaryKey="true"
+                             primaryKeyName="pk_professor"/>
             </column>
             <column name="name" type="TEXT"/>
             <column name="department_id" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
 
@@ -30,12 +32,13 @@
 
         <createTable tableName="course">
             <column name="id" type="serial">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_course"/>
+                <constraints nullable="false" primaryKey="true"
+                             primaryKeyName="pk_course"/>
             </column>
             <column name="name" type="TEXT"/>
             <column name="credits" type="int"/>
             <column name="department_id" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
 
@@ -51,10 +54,10 @@
             <column name="semester" type="int"/>
             <column name="year" type="int"/>
             <column name="course_id" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="professor_id" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
 

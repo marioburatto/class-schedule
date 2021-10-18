@@ -34,8 +34,10 @@ public class ProfessorServiceIntegrationTest extends BaseSpringIntegrationTest {
                 professorService.findById(professor.getId()).get().getName(),
                 Is.is(professor.getName()));
 
-        professor.setName("SOME NEW NAME");
-        professor.setDepartment(department2);
+        professor = professor.toBuilder()
+                .name("SOME NEW NAME")
+                .department(department2)
+                .build();
         professorService.update(professor);
 
         MatcherAssert.assertThat(

@@ -1,7 +1,9 @@
 package com.philips.classschedule.controller;
 
-import com.philips.classschedule.domain.Course;
+import com.philips.classschedule.controller.dto.CourseDto;
+import com.philips.classschedule.controller.mapper.CourseDtoMapper;
 import com.philips.classschedule.service.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,44 +16,59 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/course")
 public class CourseController {
+
+    @Autowired
     private CourseService courseService;
 
-    public CourseController(CourseService courseService) {
-        this.courseService = courseService;
-    }
+    @Autowired
+    private CourseDtoMapper dtoMapper;
 
     @GetMapping("")
-    List<Course> listAll() {
-        return courseService.listAll();
+    List<CourseDto> listAll() {
+        return courseService.listAll()
+                .stream()
+                .map(dtoMapper::domainToDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("")
-    ResponseEntity<Course> createCourse(@RequestBody Course course) {
-        if (course.getId() != null && courseService.findById(course.getId()).isPresent()) {
+    ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto courseDto) {
+        if (courseDto.getId() != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        return ResponseEntity.ok(courseService.create(course));
+        return Optional.of(courseDto)
+                .map(dtoMapper::dtoToDomain)
+                .map(courseService::create)
+                .map(dtoMapper::domainToDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Course> findById(@PathVariable Integer id) {
+    ResponseEntity<CourseDto> findById(@PathVariable Integer id) {
         return courseService.findById(id)
+                .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Course> updateCourse(@RequestBody Course course, @PathVariable Integer id) {
-        if (course.getId() != null && !course.getId().equals(id)) {
+    ResponseEntity<CourseDto> updateCourse(@RequestBody CourseDto courseDto,
+                                           @PathVariable Integer id) {
+        if (courseDto.getId() != null && !courseDto.getId().equals(id)) {
             return ResponseEntity.badRequest().build();
         }
 
         return courseService.findById(id)
-                .map(oldCourse -> courseService.update(course))
+                .map(it -> dtoMapper.dtoToDomain(courseDto))
+                .map(courseService::update)
+                .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

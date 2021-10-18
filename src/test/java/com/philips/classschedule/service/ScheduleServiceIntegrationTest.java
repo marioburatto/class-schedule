@@ -16,8 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 public class ScheduleServiceIntegrationTest extends BaseSpringIntegrationTest {
 
     @Autowired
@@ -36,7 +34,7 @@ public class ScheduleServiceIntegrationTest extends BaseSpringIntegrationTest {
     private ScheduleRepository scheduleRepository;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         scheduleRepository.deleteAll();
     }
 

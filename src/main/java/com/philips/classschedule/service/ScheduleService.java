@@ -16,13 +16,13 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    public Optional<Schedule> findByExample(Schedule example){
+    public Optional<Schedule> findByExample(Schedule example) {
         return scheduleRepository
                 .findById(example)
                 .map(ScheduleEntity::getSchedule);
     }
 
-    public List<Schedule> listAll(){
+    public List<Schedule> listAll() {
         return scheduleRepository
                 .findAll()
                 .stream()
@@ -30,13 +30,13 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    public Schedule create(Schedule schedule){
+    public Schedule create(Schedule schedule) {
         return scheduleRepository
                 .save(new ScheduleEntity(schedule))
                 .getSchedule();
     }
 
-    public void delete(Schedule schedule){
+    public void delete(Schedule schedule) {
         scheduleRepository.deleteById(schedule);
     }
 }

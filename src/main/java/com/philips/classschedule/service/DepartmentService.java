@@ -14,23 +14,23 @@ public class DepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    public Optional<Department> findById(Integer id){
+    public Optional<Department> findById(Integer id) {
         return departmentRepository.findById(id);
     }
 
-    public List<Department> listAll(){
+    public List<Department> listAll() {
         return departmentRepository.findAll();
     }
 
-    public Department create(Department department){
+    public Department create(Department department) {
         return departmentRepository.save(department);
     }
 
-    public Department update(Department department){
+    public Department update(Department department) {
         return departmentRepository.save(department);
     }
 
-    public void delete(Department department){
+    public void delete(Department department) {
         departmentRepository.delete(department);
     }
 
