@@ -5,7 +5,7 @@ A Class Schedule Manager application for Philips assignment test.
 ## Implementation Details
 
 ### Design Considerations
-The application was developed based on Java 11, Postgres 9, Spring-Web and JPA.
+The application was developed based on Java 11, Postgres 9, Spring Boot, Spring-Web and JPA.
 
 The _**Presentation**_ layer was represented by the *Controller classes which were handling a respective DTO (Data Transfer Object) for the inbound and outbound data communications.
 Each DTO have its respective Mapper class that translates the DTO's into domains in order to send and receive data from the Service layer.
