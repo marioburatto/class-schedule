@@ -16,26 +16,26 @@ public class DepartmentServiceIntegrationTest extends BaseSpringIntegrationTest 
 
     @Test
     public void basicCrudTest() {
-        Department department = departmentService.create(DepartmentFixture.aNewDepartment());
+        Department department = departmentService.create(DepartmentFixture.aNewDepartment()).block();
         MatcherAssert.assertThat(department.getId(), IsNull.notNullValue());
 
         MatcherAssert.assertThat(
-                departmentService.findById(department.getId()).get().getName(),
+                departmentService.findById(department.getId()).block().getName(),
                 Is.is(department.getName()));
 
         department = department.toBuilder()
                 .name("SOME NEW NAME")
                 .build();
-        departmentService.update(department);
+        departmentService.update(department).block();
 
         MatcherAssert.assertThat(
-                departmentService.findById(department.getId()).get().getName(),
+                departmentService.findById(department.getId()).block().getName(),
                 Is.is(department.getName()));
 
-        departmentService.delete(department);
+        departmentService.delete(department).block();
 
         MatcherAssert.assertThat(
-                departmentService.findById(department.getId()).isPresent(),
+                departmentService.findById(department.getId()).hasElement().block(),
                 Is.is(false));
     }
 }

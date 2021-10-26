@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/course")
@@ -30,56 +28,51 @@ public class CourseController {
     private CourseDtoMapper dtoMapper;
 
     @GetMapping("")
-    List<CourseDto> listAll() {
+    Flux<CourseDto> listAll() {
         return courseService.listAll()
-                .stream()
-                .map(dtoMapper::domainToDto)
-                .collect(Collectors.toList());
+                .map(dtoMapper::domainToDto);
     }
 
     @PostMapping("")
-    ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto courseDto) {
+    Mono<ResponseEntity<CourseDto>> createCourse(@RequestBody CourseDto courseDto) {
         if (courseDto.getId() != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
         }
-        return Optional.of(courseDto)
+        return Mono.just(courseDto)
                 .map(dtoMapper::dtoToDomain)
-                .map(courseService::create)
+                .flatMap(courseService::create)
                 .map(dtoMapper::domainToDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<CourseDto> findById(@PathVariable Integer id) {
+    Mono<ResponseEntity<CourseDto>> findById(@PathVariable Integer id) {
         return courseService.findById(id)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<CourseDto> updateCourse(@RequestBody CourseDto courseDto,
-                                           @PathVariable Integer id) {
+    Mono<ResponseEntity<CourseDto>> updateCourse(@RequestBody CourseDto courseDto,
+                                                 @PathVariable Integer id) {
         if (courseDto.getId() != null && !courseDto.getId().equals(id)) {
-            return ResponseEntity.badRequest().build();
+            return Mono.just(ResponseEntity.badRequest().build());
         }
 
         return courseService.findById(id)
                 .map(it -> dtoMapper.dtoToDomain(courseDto))
-                .map(courseService::update)
+                .flatMap(courseService::update)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteCourse(@PathVariable Integer id) {
+    Mono<ResponseEntity<Object>> deleteCourse(@PathVariable Integer id) {
         return courseService.findById(id)
-                .map(oldCourse -> {
-                    courseService.delete(oldCourse);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .flatMap(courseService::delete)
+                .map(result -> ResponseEntity.noContent().build())
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 }
