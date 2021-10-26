@@ -4,9 +4,8 @@ import com.philips.classschedule.domain.Course;
 import com.philips.classschedule.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class CourseService {
@@ -14,24 +13,24 @@ public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
 
-    public Optional<Course> findById(Integer id) {
+    public Mono<Course> findById(Integer id) {
         return courseRepository.findById(id);
     }
 
-    public List<Course> listAll() {
+    public Flux<Course> listAll() {
         return courseRepository.findAll();
     }
 
-    public Course create(Course course) {
+    public Mono<Course> create(Course course) {
         return courseRepository.save(course);
     }
 
-    public Course update(Course course) {
+    public Mono<Course> update(Course course) {
         return courseRepository.save(course);
     }
 
-    public void delete(Course course) {
-        courseRepository.delete(course);
+    public Mono<Void> delete(Course course) {
+        return courseRepository.delete(course);
     }
 
 }

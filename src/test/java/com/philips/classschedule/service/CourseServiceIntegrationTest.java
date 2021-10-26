@@ -22,17 +22,17 @@ public class CourseServiceIntegrationTest extends BaseSpringIntegrationTest {
     @Test
     public void basicCrudTest() {
         Department department1 = departmentService.create(
-                DepartmentFixture.aNewDepartment());
+                DepartmentFixture.aNewDepartment()).block();
         Department department2 = departmentService.create(
-                DepartmentFixture.aNewDepartment("SomeDifferentDepartment"));
+                DepartmentFixture.aNewDepartment("SomeDifferentDepartment")).block();
 
-        Course course = courseService.create(CourseFixture.aNewCourse(department1));
+        Course course = courseService.create(CourseFixture.aNewCourse(department1)).block();
         MatcherAssert.assertThat(course.getId(), IsNull.notNullValue());
         MatcherAssert.assertThat(course.getCredits(), Is.is(6));
         MatcherAssert.assertThat(course.getDepartment().getId(), Is.is(department1.getId()));
 
         MatcherAssert.assertThat(
-                courseService.findById(course.getId()).get().getName(),
+                courseService.findById(course.getId()).block().getName(),
                 Is.is(course.getName()));
 
         course = course.toBuilder()
@@ -40,18 +40,18 @@ public class CourseServiceIntegrationTest extends BaseSpringIntegrationTest {
                 .credits(4)
                 .department(department2)
                 .build();
-        courseService.update(course);
+        courseService.update(course).block();
 
         MatcherAssert.assertThat(
-                courseService.findById(course.getId()).get().getName(),
+                courseService.findById(course.getId()).block().getName(),
                 Is.is(course.getName()));
         MatcherAssert.assertThat(course.getCredits(), Is.is(4));
         MatcherAssert.assertThat(course.getDepartment().getId(), Is.is(department2.getId()));
 
-        courseService.delete(course);
+        courseService.delete(course).block();
 
         MatcherAssert.assertThat(
-                courseService.findById(course.getId()).isPresent(),
+                courseService.findById(course.getId()).hasElement().block(),
                 Is.is(false));
     }
 }

@@ -4,9 +4,8 @@ import com.philips.classschedule.domain.Department;
 import com.philips.classschedule.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class DepartmentService {
@@ -14,24 +13,24 @@ public class DepartmentService {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    public Optional<Department> findById(Integer id) {
+    public Mono<Department> findById(Integer id) {
         return departmentRepository.findById(id);
     }
 
-    public List<Department> listAll() {
+    public Flux<Department> listAll() {
         return departmentRepository.findAll();
     }
 
-    public Department create(Department department) {
+    public Mono<Department> create(Department department) {
         return departmentRepository.save(department);
     }
 
-    public Department update(Department department) {
+    public Mono<Department> update(Department department) {
         return departmentRepository.save(department);
     }
 
-    public void delete(Department department) {
-        departmentRepository.delete(department);
+    public Mono<Void> delete(Department department) {
+        return departmentRepository.delete(department);
     }
 
 }

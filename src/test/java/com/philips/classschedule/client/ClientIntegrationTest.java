@@ -9,13 +9,13 @@ import com.philips.classschedule.controller.dto.ScheduleDto;
 import com.philips.classschedule.repository.ScheduleRepository;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
+import reactor.test.StepVerifier;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,13 +41,15 @@ public class ClientIntegrationTest {
 
     @BeforeEach
     void cleanUp() {
-        scheduleRepository.deleteAll();
+        scheduleRepository.deleteAll().block();
     }
 
     @Test
     void testLoadExampleData() throws IOException {
         loadExampleData();
-        MatcherAssert.assertThat(scheduleRepository.count(), Is.is(10L));
+        scheduleRepository.count()
+                .as(StepVerifier::create)
+                .expectNextCount(10L);
 
         JsonNode search = get("/search", JsonNode.class);
         JsonNode expected = new ObjectMapper().readTree(

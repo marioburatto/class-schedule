@@ -5,9 +5,8 @@ import com.philips.classschedule.domain.projection.ProfessorAndCourseNameProject
 import com.philips.classschedule.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ProfessorService {
@@ -15,29 +14,29 @@ public class ProfessorService {
     @Autowired
     private ProfessorRepository professorRepository;
 
-    public Optional<Professor> findById(Integer id) {
+    public Mono<Professor> findById(Integer id) {
         return professorRepository.findById(id);
     }
 
-    public List<Professor> listAll() {
+    public Flux<Professor> listAll() {
         return professorRepository.findAll();
     }
 
-    public List<ProfessorAndCourseNameProjection> listAllProfessorAndCourseNames() {
+    public Flux<ProfessorAndCourseNameProjection> listAllProfessorAndCourseNames() {
         return professorRepository
                 .listAllProfessorAndCourseNames();
     }
 
-    public Professor create(Professor professor) {
+    public Mono<Professor> create(Professor professor) {
         return professorRepository.save(professor);
     }
 
-    public Professor update(Professor professor) {
+    public Mono<Professor> update(Professor professor) {
         return professorRepository.save(professor);
     }
 
-    public void delete(Professor professor) {
-        professorRepository.delete(professor);
+    public Mono<Void> delete(Professor professor) {
+        return professorRepository.delete(professor);
     }
 
 }

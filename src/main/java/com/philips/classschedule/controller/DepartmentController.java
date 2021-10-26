@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/department")
@@ -30,56 +28,51 @@ public class DepartmentController {
     private DepartmentDtoMapper dtoMapper;
 
     @GetMapping("")
-    List<DepartmentDto> listAll() {
+    Flux<DepartmentDto> listAll() {
         return departmentService.listAll()
-                .stream()
-                .map(dtoMapper::domainToDto)
-                .collect(Collectors.toList());
+                .map(dtoMapper::domainToDto);
     }
 
     @PostMapping("")
-    ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto departmentDto) {
+    Mono<ResponseEntity<DepartmentDto>> createDepartment(@RequestBody DepartmentDto departmentDto) {
         if (departmentDto.getId() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
         }
-        return Optional.of(departmentDto)
+        return Mono.just(departmentDto)
                 .map(dtoMapper::dtoToDomain)
-                .map(departmentService::create)
+                .flatMap(departmentService::create)
                 .map(dtoMapper::domainToDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<DepartmentDto> findById(@PathVariable Integer id) {
+    Mono<ResponseEntity<DepartmentDto>> findById(@PathVariable Integer id) {
         return departmentService.findById(id)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<DepartmentDto> updateDepartment(@RequestBody DepartmentDto departmentDto,
-                                                   @PathVariable Integer id) {
+    Mono<ResponseEntity<DepartmentDto>> updateDepartment(@RequestBody DepartmentDto departmentDto,
+                                                         @PathVariable Integer id) {
         if (departmentDto.getId() != null && !departmentDto.getId().equals(id)) {
-            return ResponseEntity.badRequest().build();
+            return Mono.just(ResponseEntity.badRequest().build());
         }
 
         return departmentService.findById(id)
                 .map(it -> dtoMapper.dtoToDomain(departmentDto))
-                .map(departmentService::update)
+                .flatMap(departmentService::update)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteDepartment(@PathVariable Integer id) {
+    Mono<ResponseEntity<Object>> deleteDepartment(@PathVariable Integer id) {
         return departmentService.findById(id)
-                .map(oldDepartment -> {
-                    departmentService.delete(oldDepartment);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .flatMap(departmentService::delete)
+                .map(result -> ResponseEntity.noContent().build())
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 }

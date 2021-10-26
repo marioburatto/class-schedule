@@ -35,34 +35,34 @@ public class ScheduleServiceIntegrationTest extends BaseSpringIntegrationTest {
 
     @BeforeEach
     void setup() {
-        scheduleRepository.deleteAll();
+        scheduleRepository.deleteAll().block();
     }
 
     @Test
     public void basicCrudTest() {
         Department department = departmentService.create(
-                DepartmentFixture.aNewDepartment());
+                DepartmentFixture.aNewDepartment()).block();
         Professor professor = professorService.create(
-                ProfessorFixture.aNewProfessor(department));
-        Course course = courseService.create(CourseFixture.aNewCourse(department));
+                ProfessorFixture.aNewProfessor(department)).block();
+        Course course = courseService.create(CourseFixture.aNewCourse(department)).block();
 
         Schedule baseSchedule = new Schedule(1, 2021, professor, course);
 
         MatcherAssert.assertThat(
-                scheduleService.findByExample(baseSchedule).isPresent(),
+                scheduleService.findByExample(baseSchedule).hasElement().block(),
                 Is.is(false));
 
-        MatcherAssert.assertThat(scheduleService.create(baseSchedule), IsNull.notNullValue());
-        MatcherAssert.assertThat(scheduleService.create(baseSchedule), IsNull.notNullValue());
+        MatcherAssert.assertThat(scheduleService.create(baseSchedule).block(), IsNull.notNullValue());
+        MatcherAssert.assertThat(scheduleService.create(baseSchedule).block(), IsNull.notNullValue());
 
         MatcherAssert.assertThat(
-                scheduleService.findByExample(baseSchedule).isPresent(),
+                scheduleService.findByExample(baseSchedule).hasElement().block(),
                 Is.is(true));
 
-        scheduleService.delete(baseSchedule);
+        scheduleService.delete(baseSchedule).block();
 
         MatcherAssert.assertThat(
-                scheduleService.findByExample(baseSchedule).isPresent(),
+                scheduleService.findByExample(baseSchedule).hasElement().block(),
                 Is.is(false));
     }
 }

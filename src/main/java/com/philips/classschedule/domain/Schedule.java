@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 @Builder(toBuilder = true)
@@ -16,10 +14,6 @@ import java.io.Serializable;
 public class Schedule implements Serializable {
     private Integer semester;
     private Integer year;
-    @ManyToOne
-    @JoinColumn(name = "professor_id")
     private Professor professor;
-    @ManyToOne
-    @JoinColumn(name = "course_id")
     private Course course;
 }

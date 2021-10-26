@@ -1,14 +1,11 @@
 package com.philips.classschedule.service;
 
 import com.philips.classschedule.domain.Schedule;
-import com.philips.classschedule.domain.ScheduleEntity;
 import com.philips.classschedule.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ScheduleService {
@@ -16,27 +13,24 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    public Optional<Schedule> findByExample(Schedule example) {
+    public Mono<Schedule> findByExample(Schedule example) {
         return scheduleRepository
-                .findById(example)
-                .map(ScheduleEntity::getSchedule);
+                .findOne(example);
     }
 
-    public List<Schedule> listAll() {
+    public Flux<Schedule> listAll() {
         return scheduleRepository
-                .findAll()
-                .stream()
-                .map(ScheduleEntity::getSchedule)
-                .collect(Collectors.toList());
+                .findAll();
     }
 
-    public Schedule create(Schedule schedule) {
+    public Mono<Schedule> create(Schedule schedule) {
         return scheduleRepository
-                .save(new ScheduleEntity(schedule))
-                .getSchedule();
+                .save(schedule);
     }
 
-    public void delete(Schedule schedule) {
-        scheduleRepository.deleteById(schedule);
+    public Mono<Void> delete(Schedule schedule) {
+        return scheduleRepository
+                .delete(schedule)
+                .flatMap(result -> Mono.empty().then());
     }
 }

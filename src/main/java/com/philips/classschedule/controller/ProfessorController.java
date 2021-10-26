@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/professor")
@@ -29,56 +27,51 @@ public class ProfessorController {
     private ProfessorDtoMapper dtoMapper;
 
     @GetMapping("")
-    List<ProfessorDto> listAll() {
+    Flux<ProfessorDto> listAll() {
         return professorService.listAll()
-                .stream()
-                .map(dtoMapper::domainToDto)
-                .collect(Collectors.toList());
+                .map(dtoMapper::domainToDto);
     }
 
     @PostMapping("")
-    ResponseEntity<ProfessorDto> createProfessor(@RequestBody ProfessorDto professorDto) {
+    Mono<ResponseEntity<ProfessorDto>> createProfessor(@RequestBody ProfessorDto professorDto) {
         if (professorDto.getId() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
         }
-        return Optional.of(professorDto)
+        return Mono.just(professorDto)
                 .map(dtoMapper::dtoToDomain)
-                .map(professorService::create)
+                .flatMap(professorService::create)
                 .map(dtoMapper::domainToDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ProfessorDto> findById(@PathVariable Integer id) {
+    Mono<ResponseEntity<ProfessorDto>> findById(@PathVariable Integer id) {
         return professorService.findById(id)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<ProfessorDto> updateProfessor(@RequestBody ProfessorDto professorDto,
-                                                 @PathVariable Integer id) {
+    Mono<ResponseEntity<ProfessorDto>> updateProfessor(@RequestBody ProfessorDto professorDto,
+                                                       @PathVariable Integer id) {
         if (professorDto.getId() != null && !professorDto.getId().equals(id)) {
-            return ResponseEntity.badRequest().build();
+            return Mono.just(ResponseEntity.badRequest().build());
         }
 
         return professorService.findById(id)
                 .map(it -> dtoMapper.dtoToDomain(professorDto))
-                .map(professorService::update)
+                .flatMap(professorService::update)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deleteProfessor(@PathVariable Integer id) {
+    Mono<ResponseEntity<Object>> deleteProfessor(@PathVariable Integer id) {
         return professorService.findById(id)
-                .map(oldProfessor -> {
-                    professorService.delete(oldProfessor);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .flatMap(professorService::delete)
+                .map(result -> ResponseEntity.noContent().build())
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 }

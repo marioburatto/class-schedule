@@ -1,11 +1,15 @@
 package com.philips.classschedule.configuration;
 
 import de.flapdoodle.embed.process.runtime.Network;
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
+import io.r2dbc.postgresql.PostgresqlConnectionFactory;
+import io.r2dbc.spi.ConnectionFactory;
+import org.postgresql.ds.PGSimpleDataSource;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.yandex.qatools.embed.postgresql.PostgresExecutable;
 import ru.yandex.qatools.embed.postgresql.PostgresProcess;
 import ru.yandex.qatools.embed.postgresql.PostgresStarter;
@@ -28,11 +32,24 @@ public class EmbeddedDatabaseConfiguration {
 
     @Bean
     @DependsOn("postgresProcess")
+    public ConnectionFactory connectionFactory(PostgresConfig config) {
+        return new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
+                .host(config.net().host())
+                .port(config.net().port())
+                .database(config.storage().dbName())
+                .username(config.credentials().username())
+                .password(config.credentials().password())
+                .build());
+    }
+
+    @Bean
+    @LiquibaseDataSource
+    @DependsOn("postgresProcess")
     public DataSource dataSource(PostgresConfig config) {
-        DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.postgresql.Driver");
+        PGSimpleDataSource ds = new PGSimpleDataSource();
+//        ds.setDriverClassName("org.postgresql.Driver");
         ds.setUrl(format("jdbc:postgresql://%s:%s/%s", config.net().host(), config.net().port(), config.storage().dbName()));
-        ds.setUsername(config.credentials().username());
+        ds.setUser(config.credentials().username());
         ds.setPassword(config.credentials().password());
         return ds;
     }

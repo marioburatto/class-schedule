@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/schedule")
@@ -28,43 +26,36 @@ public class ScheduleController {
     private ScheduleDtoMapper dtoMapper;
 
     @GetMapping("")
-    List<ScheduleDto> listAll() {
+    Flux<ScheduleDto> listAll() {
         return scheduleService.listAll()
-                .stream()
-                .map(dtoMapper::domainToDto)
-                .collect(Collectors.toList());
+                .map(dtoMapper::domainToDto);
     }
 
     @PostMapping("")
-    ResponseEntity<ScheduleDto> createSchedule(@RequestBody ScheduleDto scheduleDto) {
-        return Optional.of(scheduleDto)
+    Mono<ResponseEntity<ScheduleDto>> createSchedule(@RequestBody ScheduleDto scheduleDto) {
+        return Mono.just(scheduleDto)
                 .map(dtoMapper::dtoToDomain)
-                .map(scheduleService::create)
+                .flatMap(scheduleService::create)
                 .map(dtoMapper::domainToDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+                .map(ResponseEntity::ok);
     }
 
     @PostMapping("/exists")
-    ResponseEntity<ScheduleDto> scheduleExists(@RequestBody ScheduleDto scheduleDto) {
+    Mono<ResponseEntity<ScheduleDto>> scheduleExists(@RequestBody ScheduleDto scheduleDto) {
 
-        return Optional.of(scheduleDto)
+        return Mono.just(scheduleDto)
                 .map(dtoMapper::dtoToDomain)
-                .map(scheduleService::findByExample)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(scheduleService::findByExample)
                 .map(dtoMapper::domainToDto)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 
     @DeleteMapping("")
-    ResponseEntity<Object> deleteSchedule(@RequestBody Schedule schedule) {
+    Mono<ResponseEntity<Object>> deleteSchedule(@RequestBody Schedule schedule) {
         return scheduleService.findByExample(schedule)
-                .map(oldSchedule -> {
-                    scheduleService.delete(oldSchedule);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .flatMap(scheduleService::delete)
+                .map(result -> ResponseEntity.noContent().build())
+                .switchIfEmpty(Mono.defer(() -> Mono.just(ResponseEntity.notFound().build())));
     }
 }

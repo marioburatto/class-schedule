@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/search")
@@ -21,15 +18,10 @@ public class SearchController {
     @Autowired
     private ProfessorAndCourseDtoMapper dtoMapper;
 
-    @Autowired
-    private EntityManager entityManager;
-
     @GetMapping("")
-    List<ProfessorAndCourseDto> listAll() {
+    Flux<ProfessorAndCourseDto> listAll() {
         return professorService.listAllProfessorAndCourseNames()
-                .stream()
-                .map(dtoMapper::domainToDto)
-                .collect(Collectors.toList());
+                .map(dtoMapper::domainToDto);
     }
 
 }
