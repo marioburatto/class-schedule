@@ -4,10 +4,16 @@ A Class Schedule Manager application for Philips assignment test.
 
 ## Implementation Details
 
+This application has [2 releases](https://github.com/marioburatto/class-schedule/releases): 
+1. SpringDataJpa based;
+2. SpringWebFlux and SpringDataR2dbc based.
+
+
 ### Design Considerations
 
+
 The application was developed based on Java 11, Postgres 9, Spring Boot,
-Spring-Web and JPA.
+Spring-Web / Web-Flux and Spring Data JPA / R2dbc.
 
 The _**Presentation**_ layer was represented by the *Controller classes which
 were handling a respective DTO (Data Transfer Object) for the inbound and
@@ -19,10 +25,10 @@ The _**Service**_ layer has no much logic and basically bridges the Presentation
 to the Persistence layer.
 
 The _**Persistence**_ layer was represented by the *Repository classes. They are
-basically a JPA Crud Repository persisting each one of the 4 domain entities:
-Department, Professor, Course and Schedule. It's important to notice that due to
-a search report requirement a dedicated database projection was added to reduce
-the amount of data loaded from the database.
+basically a Spring Data (Jpa and R2dbc) Crud Repository persisting each one of 
+the 4 domain entities:Department, Professor, Course and Schedule. It's important 
+to notice that due toa search report requirement a dedicated database projection 
+was added to reduce the amount of data loaded from the database.
 
 In order to load all the example data into the application it was created a
 script called ClientIntegrationTest. It can be executed with the following
@@ -39,14 +45,9 @@ As a highlight for future enhancements it could be listed:
    better coverage and building speed;
 2. Prepare an application instance and trigger a load test against it, according
    to the expected peak usage volume;
-3. As all the layers of this application, including the PostgreSql JDBC drivers,
-   have a mature reactive library, the entire application could be made
-   reactive, optimizing its performance and resource consumption per request. A
-   good candidate would be
-   the [Spring Data R2DBC](https://spring.io/projects/spring-data-r2dbc) or even
-   the [Reactive Hibernate](http://hibernate.org/reactive/).
+3. Maybe try a release using the latest [Reactive Hibernate](http://hibernate.org/reactive/);
 4. Configure a CI/CD environment to make the build and deployment process
-   easier;
+   easier.
 
 ## Build and Run
 
