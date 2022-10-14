@@ -1,0 +1,8 @@
+applications:
+  - name: class-schedule-demo
+    buildpack: https://github.com/cloudfoundry/java-buildpack.git#v4.16
+    path: target/class-schedule-1.0.1-SNAPSHOT.jar
+    memory: 3g
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+}}'
+      SPRING_PROFILES_ACTIVE: 'dev'
